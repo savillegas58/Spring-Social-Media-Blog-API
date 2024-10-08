@@ -34,7 +34,6 @@ public class SocialMediaController {
         if(registeredAccount != null){
             return ResponseEntity.status(200).body(account);
         }
-        
         return null;
 
         
