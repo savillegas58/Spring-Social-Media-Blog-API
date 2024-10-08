@@ -52,15 +52,15 @@ public class SocialMediaController {
     }
 
     @DeleteMapping("/messages/{message_id}")
-    public @ResponseBody Message deleteMessage(@PathVariable int messageId){
+    public @ResponseBody int deleteMessage(@PathVariable int messageId){
         messageService.deleteMessage(messageId);
-        return null;
+        return 0;
     }
 
     @PatchMapping("/messages/{message_id}")
-    public @ResponseBody Message updateMessage(@PathVariable int messageId, @RequestBody Message updatedMessage){
-        messageService.updateMessage(messageId, updatedMessage);
-        return null;
+    public @ResponseBody int updateMessage(@PathVariable int messageId, @RequestBody Message message){
+        messageService.updateMessage(messageId, message);
+        return 0;
     }
 
     @GetMapping("/accounts/{account_id}/messages")

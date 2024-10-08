@@ -6,10 +6,12 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.example.entity.Message;
 import com.example.repository.MessageRepository;
 
+@Service
 public class MessageService {
 
     MessageRepository messageRepository;
@@ -20,7 +22,15 @@ public class MessageService {
     }
 
     public Message postMessage(Message message){
-        return messageRepository.save(message);
+        
+        
+        if(!message.getMessageText().isEmpty() && message.getMessageText().length() < 255){
+
+            return messageRepository.save(message);
+
+        }
+        
+        return null;
     }
 
     public List<Message> getAllMessages(){
@@ -29,28 +39,36 @@ public class MessageService {
 
     public Message getMessageById(int messageId){
 
-        Optional<Message> optionalMessage = messageRepository.findById(messageId);
+        return messageRepository.findById(messageId).get();
 
+    }
+
+    public int deleteMessage(int messageId){
+        Optional<Message> optionalMessage = messageRepository.findById(messageId);
+        int rowsDeleted = 0;
+        
         if(optionalMessage.isPresent()){
-            return optionalMessage.get();
-        } else{
-            return null;
+            messageRepository.deleteById(messageId);
+            rowsDeleted = 1;
+            return rowsDeleted;
         }
 
-
+        return rowsDeleted;
     }
 
-    public void deleteMessage(int messageId){
-        messageRepository.deleteById(messageId);
-    }
-
-    public void updateMessage(int messageId, Message updatedMessage){
+    public int updateMessage(int messageId, Message message){
         Optional<Message> optionalMessage = messageRepository.findById(messageId);
+        int rowsUpdated = 0;
 
-        if(optionalMessage.isPresent()){
+        if(optionalMessage.isPresent() && !message.getMessageText().isEmpty() && message.getMessageText().length() <= 255){
+            Message updatedMessage = optionalMessage.get();
+            updatedMessage.setMessageText(message.getMessageText());
+            messageRepository.save(updatedMessage);
+            rowsUpdated = 1;
+            return rowsUpdated;
 
         } else{
-
+            return rowsUpdated;
         }
     }
 
