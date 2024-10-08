@@ -1,8 +1,10 @@
 package com.example.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -26,46 +28,73 @@ public class SocialMediaController {
     MessageService messageService;
 
     @PostMapping("/register")
-    public @ResponseBody Account register(@RequestBody Account account){
-        accountService.register(account);
-        return account;
+    public @ResponseBody ResponseEntity<Account> register(@RequestBody Account account){
+        
+        Account registeredAccount = accountService.register(account);
+        if(registeredAccount != null){
+            return ResponseEntity.status(200).body(account);
+        }
+        
+        return null;
+
+        
     }
     @PostMapping("/login")
-    public @ResponseBody Account login(@RequestBody Account account){
-        accountService.login(account);
-        return account;
+    public @ResponseBody ResponseEntity<Account> login(@RequestBody Account account){
+        Account loggedInAccount = accountService.login(account);
+
+        if(loggedInAccount != null){
+            return ResponseEntity.status(200).body(loggedInAccount);
+        }
+        return ResponseEntity.status(401).body(null);
     }
     @PostMapping("/messages")
-    public @ResponseBody Message postMessage(@RequestBody Message message){
-        messageService.postMessage(message);
-        return message;
+    public @ResponseBody ResponseEntity<Message> postMessage(@RequestBody Message message){
+        Message postedMessage = messageService.postMessage(message);
+
+        if(postedMessage != null){
+            return ResponseEntity.status(200).body(postedMessage);
+        }
+        return ResponseEntity.status(400).body(null);
     }
     @GetMapping("/messages")
-    public @ResponseBody List<Message> getAllMessages(){
-        messageService.getAllMessages();
-        return null;
+    public @ResponseBody ResponseEntity<List<Message>> getAllMessages(){
+        List<Message> allMessages = messageService.getAllMessages();
+        return ResponseEntity.status(200).body(allMessages);
     }
     @GetMapping("/messages/{message_id}")
-    public @ResponseBody Message getMessageById(@PathVariable int messageId){
-        messageService.getMessageById(messageId);
-        return null;
+    public @ResponseBody ResponseEntity<Message> getMessageById(@PathVariable int messageId){
+        Message receivedMessage = messageService.getMessageById(messageId);
+        return ResponseEntity.status(200).body(receivedMessage);
     }
 
     @DeleteMapping("/messages/{message_id}")
-    public @ResponseBody int deleteMessage(@PathVariable int messageId){
-        messageService.deleteMessage(messageId);
-        return 0;
+    public @ResponseBody ResponseEntity<Integer> deleteMessage(@PathVariable int messageId){
+        
+        int deleted = messageService.deleteMessage(messageId);
+        if(deleted == 1){
+            return ResponseEntity.status(200).body(1);
+        } else{
+            return ResponseEntity.status(200).body(null);
+        }
+        
+        
     }
 
     @PatchMapping("/messages/{message_id}")
-    public @ResponseBody int updateMessage(@PathVariable int messageId, @RequestBody Message message){
-        messageService.updateMessage(messageId, message);
-        return 0;
+    public @ResponseBody ResponseEntity<Integer> updateMessage(@PathVariable int messageId, @RequestBody Message message){
+        int updated = messageService.updateMessage(messageId, message);
+        if(updated == 1){
+            return ResponseEntity.status(200).body(1);
+        } else{
+            return ResponseEntity.status(400).body(null);
+        }
+        
     }
 
     @GetMapping("/accounts/{account_id}/messages")
-    public @ResponseBody List<Message> getAllMessagesGivenAccountId(@PathVariable int accountId){
-        messageService.getAllMessagesGivenAccountId(accountId);
-        return null;
+    public @ResponseBody ResponseEntity<List<Message>> getAllMessagesGivenAccountId(@PathVariable int accountId){
+        List<Message> allMessages = messageService.getAllMessagesGivenAccountId(accountId);
+        return ResponseEntity.status(200).body(allMessages);
     }
 }

@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import javax.swing.text.html.Option;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,15 +40,18 @@ public class MessageService {
     }
 
     public Message getMessageById(int messageId){
-
-        return messageRepository.findById(messageId).get();
+        Optional<Message> optionalMessage = messageRepository.findById(messageId);
+        if(optionalMessage.isPresent()){
+            return optionalMessage.get();
+        }
+        return null;
 
     }
 
     public int deleteMessage(int messageId){
         Optional<Message> optionalMessage = messageRepository.findById(messageId);
         int rowsDeleted = 0;
-        
+
         if(optionalMessage.isPresent()){
             messageRepository.deleteById(messageId);
             rowsDeleted = 1;
