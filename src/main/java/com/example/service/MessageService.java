@@ -1,58 +1,57 @@
 package com.example.service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
-import javax.swing.text.html.Option;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.entity.Message;
+import com.example.repository.AccountRepository;
 import com.example.repository.MessageRepository;
 
 @Service
 public class MessageService {
 
     MessageRepository messageRepository;
+    AccountRepository accountRepository;
 
     @Autowired
-    public MessageService(MessageRepository messageRepository){
+    public MessageService(MessageRepository messageRepository, AccountRepository accountRepository) {
         this.messageRepository = messageRepository;
+        this.accountRepository = accountRepository;
     }
 
-    public Message postMessage(Message message){
-        
-        
-        if(!message.getMessageText().isEmpty() && message.getMessageText().length() < 255){
+    public Message postMessage(Message message) {
+
+        if (accountRepository.findById(message.getPostedBy()).isPresent() && !message.getMessageText().isEmpty()
+                && message.getMessageText().length() < 255) {
 
             return messageRepository.save(message);
 
         }
-        
+
         return null;
     }
 
-    public List<Message> getAllMessages(){
+    public List<Message> getAllMessages() {
         return messageRepository.findAll();
     }
 
-    public Message getMessageById(int messageId){
+    public Message getMessageById(int messageId) {
         Optional<Message> optionalMessage = messageRepository.findById(messageId);
-        if(optionalMessage.isPresent()){
+        if (optionalMessage.isPresent()) {
             return optionalMessage.get();
         }
         return null;
 
     }
 
-    public int deleteMessage(int messageId){
+    public int deleteMessage(int messageId) {
         Optional<Message> optionalMessage = messageRepository.findById(messageId);
         int rowsDeleted = 0;
 
-        if(optionalMessage.isPresent()){
+        if (optionalMessage.isPresent()) {
             messageRepository.deleteById(messageId);
             rowsDeleted = 1;
             return rowsDeleted;
@@ -61,26 +60,27 @@ public class MessageService {
         return rowsDeleted;
     }
 
-    public int updateMessage(int messageId, Message message){
+    public int updateMessage(int messageId, Message message) {
         Optional<Message> optionalMessage = messageRepository.findById(messageId);
         int rowsUpdated = 0;
 
-        if(optionalMessage.isPresent() && !message.getMessageText().isEmpty() && message.getMessageText().length() <= 255){
+        if (optionalMessage.isPresent() && !message.getMessageText().isEmpty()
+                && message.getMessageText().length() <= 255) {
             Message updatedMessage = optionalMessage.get();
             updatedMessage.setMessageText(message.getMessageText());
             messageRepository.save(updatedMessage);
             rowsUpdated = 1;
             return rowsUpdated;
 
-        } else{
+        } else {
             return rowsUpdated;
         }
     }
 
-    public List<Message> getAllMessagesGivenAccountId(int postedBy){
-        ArrayList<Message> allMessages = new ArrayList<>(Arrays.asList(messageRepository.findMessagesByPostedBy(postedBy)));
+    public List<Message> getAllMessagesGivenAccountId(int postedBy) {
+        List<Message> allMessages = messageRepository.findMessagesByPostedBy(postedBy);
         return allMessages;
-        
+
     }
 
 }
